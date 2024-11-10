@@ -120,6 +120,20 @@ class TimeRecord(BaseModel):
     tot_cpu_sys: float | None = None
     "System CPU time (including concurrent children)."
 
+    avg_proc_cpu_util: float | None = None
+    """
+    Average CPU utilization by this process. Not normalized by process count
+    (100% = full use of 1 CPU).
+
+    .. seealso:: :meth:`psutil.Process.cpu_percent`
+    """
+    avg_sys_cpu_util: float | None = None
+    """
+    Average system-wide CPU utilization while this process is running.
+
+    .. seealso:: :meth:`psutil.cpu_percent`
+    """
+
 
 class MemoryRecord(BaseModel):
     """
