@@ -1,0 +1,99 @@
+[build-system]
+requires = ["hatchling ~=1.0", "hatch-vcs ~=0.4.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "xshaper"
+description = "eXperiment Shaperate — record and remember experiment runs."
+authors = [
+  { name = "Michael Ekstrand", email = "mdekstrand@drexel.edu" },
+]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+]
+requires-python = ">= 3.11"
+readme = "README.md"
+license = { file = "LICENSE.md" }
+dynamic = ["version"]
+dependencies = [
+]
+
+[dependency-groups]
+dev = [
+  "setuptools>=64",
+  "setuptools_scm>=8",
+  "build ==1.*",
+  "ruff >= 0.2",
+  "pyright",
+  "unbeheader ~= 1.3", # p2c: -p
+]
+test = [
+  "pytest >=7",
+]
+doc = [
+  "sphinx >=8",
+  "sphinxext-opengraph >= 0.5",
+  "furo",
+]
+
+[project.urls]
+Homepage = "https://xshaper.lenksit.org"
+GitHub = "https://github.com/lenskit/xshaper"
+
+# configure build tools
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.sdist]
+include = ["xshaper", "LICENSE.md", "README.md"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["xshaper"]
+
+[tool.hatch.version]
+source = "vcs"
+raw-options = { root = "..", version_scheme = "release-branch-semver" }
+
+[tool.hatch.build.hooks.vcs]
+version-file = "xshaper/_version.py"
+
+# development tools
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = [
+  ".git",
+  "__pycache__",
+  "docs/conf.py",
+  "build",
+  "dist",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.lint.isort]
+section-order = [
+  "future",
+  "standard-library",
+  "third-party",
+  "testing",
+  "first-party",
+  "local-folder",
+]
+
+[tool.ruff.lint.isort.sections]
+testing = ["pytest", "hypothesis"]
+
+[tool.mypy]
+exclude = "^docs/"
+
+[tool.pyright]
+typeCheckingMode = "strict"
+exclude = [
+  "docs/*",
+]
+reportMissingImports = true
+reportMissingTypeStubs = false
