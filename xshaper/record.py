@@ -11,7 +11,9 @@ from uuid import UUID
 from pydantic import BaseModel, Field, JsonValue
 
 RunMeta: TypeAlias = dict[str, JsonValue]
-"Type of run metadata."
+"""
+Type of run metadata.
+"""
 RunStatus: TypeAlias = Literal["completed", "failed", "aborted", "unfinished"]
 """
 A run's completion status.
