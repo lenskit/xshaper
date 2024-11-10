@@ -24,7 +24,7 @@ class RunRecord(BaseModel):
     """
 
     run_id: UUID
-    "The identifier for this run."
+    "The unique identifier for this run."
     parent_id: UUID | None = None
     "The identifier for this run's parent."
     anchor_id: UUID | None = None
@@ -41,6 +41,7 @@ class RunRecord(BaseModel):
     """
     root_id: UUID | None = None
     "The identifier for the root of this run's run tree."
+
     concurrent: bool = False
     "Whether this run is concurent with its siblings (e.g. worker processes)."
 
@@ -63,6 +64,13 @@ class RunRecord(BaseModel):
 
     machine: MachineRecord | None = None
     "The machine on which this run was run (if ``None``, inherits from parent)."
+
+    time: TimeRecord
+    "Wall and CPU time consumption."
+    memory: MemoryRecord | None = None
+    "Estimated memory use."
+    power: PowerRecord | None = None
+    "Estimated power consumption."
 
 
 class MachineRecord(BaseModel):
@@ -88,3 +96,81 @@ class MachineRecord(BaseModel):
     "The Linux distribution ID (e.g. debian, ubuntu)."
     distro_version: str | None = None
     "The Linux distribution version."
+
+
+class TimeRecord(BaseModel):
+    """
+    Record of the time (both wall-clock and CPU) consumed by a run.  All times
+    are in seconds.
+    """
+
+    wall: float
+    "Wall-clock elapsed time."
+    self_cpu: float | None = None
+    "Total CPU time (this run)."
+    self_cpu_usr: float | None = None
+    "Userspace CPU time (this run)."
+    self_cpu_sys: float | None = None
+    "System CPU time (this run)."
+
+    tot_cpu: float | None = None
+    "Total CPU time (including concurrent children)."
+    tot_cpu_usr: float | None = None
+    "Userspace CPU time (including concurrent children)."
+    tot_cpu_sys: float | None = None
+    "System CPU time (including concurrent children)."
+
+
+class MemoryRecord(BaseModel):
+    """
+    Record of the memory used by the run (approximate).
+    """
+
+    peak_rss: float | None = None
+    """
+    Peak memory (resident set on Unix, working set on Windows) as measured by
+    monitoring the process memory statistics.
+    """
+    peak_shared: float | None = None
+    """
+    Peak sharable memory (Linux ``shared``) as measured by monitoring the
+    process memory statistics.
+    """
+
+    max_rss: float | None = None
+    """
+    Maximum resident memory as measured by the operating system.  For multiple
+    runs in a single process, will not be accurate (will be the maximum RSS of
+    this run and any previous run in the same process).  Does not account for
+    child processes.
+    """
+
+
+class PowerRecord(BaseModel):
+    """
+    Record of the (estimated) power consumed by a run.  All values are in
+    watt-hours.
+    """
+
+    cpu_power: float | None = None
+    """
+    Power consumed by the CPU.  When reported, this is based on the system's CPU
+    on-package power measurement.
+    """
+    ram_power: float | None = None
+    """
+    Power consumed by RAM.  When reported, this is based on the system chipset
+    or SoC package's on-package RAM power measurement.
+    """
+    gpu_power: float | None = None
+    """
+    Power consumed by the GPU(s).  When reported, this is based on the GPU
+    chipset's power consumption reporting (e.g. via NVML for NVidia cards).
+    """
+    chassis_power: float | None = None
+    """
+    Power consumed by the entire machine.  This is typically measured by the
+    chassis PSU, datacenter PDU, or by a metering smart plug (see e.g. EMERS_).
+
+    .. _EMERS: https://github.com/ISG-Siegen/emers
+    """
