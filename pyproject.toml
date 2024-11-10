@@ -21,6 +21,7 @@ dependencies = [
   "pydantic ~=2.9",
   "psutil ~=6.0",
   "humanize ~=4.5",
+  "zstandard >=0.23",
 ]
 
 [dependency-groups]
