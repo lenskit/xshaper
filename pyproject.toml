@@ -27,8 +27,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-  "setuptools>=64",
-  "setuptools_scm>=8",
   "build ==1.*",
   "ruff >=0.2",
   "pyright",
