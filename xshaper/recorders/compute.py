@@ -8,7 +8,7 @@ from time import perf_counter
 
 from psutil import Process, cpu_count, cpu_percent
 
-from ..model import CPURecord, MemoryRecord
+from ..model import CPURecord, MemoryRecord, RunRecord
 
 
 @dataclass(frozen=True, slots=True)
@@ -22,8 +22,7 @@ class ComputeMeasurements:
 
 
 class ComputeRecorder:
-    cpu: CPURecord
-    memory: MemoryRecord
+    record: RunRecord
 
     # memory of highest memory usage
     _peak_rss: float = 0
@@ -35,30 +34,42 @@ class ComputeRecorder:
     _tot_proc_pct: float = 0.0
     _tot_sys_pct: float = 0.0
 
-    def __init__(self, cpu: CPURecord, memory: MemoryRecord):
-        self.cpu = cpu
-        self.memory = memory
+    def __init__(self, record: RunRecord):
+        self.record = record
 
         self._tot_time = 0.0
         self._tot_proc_pct = 0.0
         self._tot_sys_pct = 0.0
 
     def start(self):
-        self.cpu.physical_cores = cpu_count(False)
-        self.cpu.logical_cores = cpu_count(True)
-        self.cpu.python_cpus = os.cpu_count()
+        physical_cores = cpu_count(False)
+        logical_cores = cpu_count(True)
+        python_cpus = os.cpu_count()
 
         if hasattr(os, "process_cpu_count"):
-            self.cpu.process_cpus = os.process_cpu_count()  # type: ignore
+            process_cpus = os.process_cpu_count()  # type: ignore
         elif hasattr(os, "sched_getaffinity"):
-            self.cpu.process_cpus = len(os.sched_getaffinity())  # type: ignore
+            process_cpus = len(os.sched_getaffinity())  # type: ignore
+        else:
+            process_cpus = None
+
+        if self.record.cpu is None:
+            self.record.cpu = CPURecord(
+                physical_cores=physical_cores,
+                logical_cores=logical_cores,
+                python_cpus=python_cpus,
+                process_cpus=process_cpus,  # type: ignore
+            )
+        if self.record.memory is None:
+            self.record.memory = MemoryRecord()
 
     def finish(self):
         try:
             import resource
 
             m = resource.getrusage(resource.RUSAGE_SELF)
-            self.memory.max_rss = m.ru_maxrss
+            if self.record.memory is not None:
+                self.record.memory.max_rss = m.ru_maxrss
         except ImportError:
             return
 
@@ -74,16 +85,18 @@ class ComputeRecorder:
         self._tot_proc_pct += diff * metrics.proc_pct
         self._tot_sys_pct += diff * metrics.sys_pct
 
-        self.cpu.avg_process_util = self._tot_proc_pct / self._tot_time
-        self.cpu.avg_system_util = self._tot_sys_pct / self._tot_time
+        if self.record.cpu is not None:
+            self.record.cpu.avg_process_util = self._tot_proc_pct / self._tot_time
+            self.record.cpu.avg_system_util = self._tot_sys_pct / self._tot_time
 
-        if metrics.rss > self._peak_rss:
-            self._peak_rss = metrics.rss
-            self.memory.peak_rss = metrics.rss
+        if self.record.memory is not None:
+            if metrics.rss > self._peak_rss:
+                self._peak_rss = metrics.rss
+                self.record.memory.peak_rss = metrics.rss
 
-        if metrics.shared is not None and metrics.shared > self._peak_shared:
-            self._peak_shared = metrics.shared
-            self.memory.peak_shared = metrics.shared
+            if metrics.shared is not None and metrics.shared > self._peak_shared:
+                self._peak_shared = metrics.shared
+                self.record.memory.peak_shared = metrics.shared
 
 
 def measure_compute() -> ComputeMeasurements:

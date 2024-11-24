@@ -79,6 +79,8 @@ class RunRecord(BaseModel):
 
     time: TimeRecord = Field(default_factory=lambda: TimeRecord())
     "Wall and CPU time consumption."
+    cpu: CPURecord | None = None
+    "Approximate CPU consumption."
     memory: MemoryRecord | None = None
     "Estimated memory use."
     power: PowerRecord | None = None
@@ -146,20 +148,20 @@ class CPURecord(BaseModel):
     Record of CPU utilization statistics.
     """
 
-    physical_cores: int | None
+    physical_cores: int | None = None
     "Total phsyical cores on the system."
 
-    logical_cores: int | None
+    logical_cores: int | None = None
     "Total logcial cores on the system."
 
-    python_cpus: int | None
+    python_cpus: int | None = None
     """
     Total CPUs reported by Python.  This is the result of :func:`os.cpu_count`;
     it will usually equal :attr:`total_cpus` unless the ``PYTHON_CPU_COUNT``
     variable is set.
     """
 
-    process_cpus: int | None
+    process_cpus: int | None = None
     """
     The number of CPUs available to this process, as reported by
     :func:`os.process_cpu_count` or :func:`os.sched_getaffinity`.

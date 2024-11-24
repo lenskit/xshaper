@@ -12,6 +12,8 @@ from uuid import UUID, uuid4
 
 from .config import lobby_dir
 from .model import RunMeta, RunRecord, RunStatus
+from .recorders.compute import ComputeRecorder
+from .recorders.time import TimeRecorder
 
 _log = logging.getLogger(__name__)
 
@@ -51,6 +53,10 @@ class RunState:
                 return self._anchors[-1]
             else:
                 return None
+
+    @property
+    def active_runs(self) -> list[Run]:
+        return self._stack
 
     def push_run(self, run: Run, anchor: bool = False):
         with self.lock:
@@ -98,6 +104,9 @@ class Run:
     record: RunRecord
     is_anchor: bool = False
 
+    time_recorder: TimeRecorder
+    compute_recorder: ComputeRecorder
+
     _start_time: float
 
     def __init__(
@@ -125,6 +134,9 @@ class Run:
         if arun := STATE.anchor:
             self.record.anchor_id = arun.id
 
+        self.time_recorder = TimeRecorder(self.record.time)
+        self.compute_recorder = ComputeRecorder(self.record)
+
     @property
     def parent_id(self) -> UUID | None:
         "Get the run's parent ID."
@@ -135,11 +147,16 @@ class Run:
         Begin the run.  You should usually use the run as a context manager
         instead of calling this method directly.
         """
+        from .monitor import active_monitor
+
         _log.debug("beginning run %s", self.id)
 
         self.record.start_time = datetime.now()
 
         STATE.push_run(self, self.is_anchor)
+        if monitor := active_monitor():
+            # push measurements so this run's recorders can initialize
+            monitor.refresh()
 
     def end(self, status: RunStatus = "completed"):
         """

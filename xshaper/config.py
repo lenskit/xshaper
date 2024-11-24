@@ -9,10 +9,9 @@ from pathlib import Path
 
 _configured: bool = False
 _log_dir: Path | None = None
-_monitor_frequency: float = 0.5
 
 
-def configure(log_dir: PathLike[str] | None = None, monitor_frequency: float = 0.5):
+def configure(log_dir: PathLike[str] | None = None):
     """
     Configure the shaperate.
 
@@ -22,14 +21,12 @@ def configure(log_dir: PathLike[str] | None = None, monitor_frequency: float = 0
         monitor_frequency:
             The frequency for background system monitoring tasks (in seconds).
     """
-    global _configured, _log_dir, _monitor_frequency
+    global _configured, _log_dir
     if _configured:
         raise RuntimeError("shaperate already configured")
 
     if log_dir is not None:
         _log_dir = Path(log_dir)
-
-    _monitor_frequency = monitor_frequency
 
     _configured = True
 
@@ -49,7 +46,3 @@ def lobby_dir() -> Path | None:
     ld = log_dir()
     if ld is not None:
         return ld / "recorded"
-
-
-def monitor_frequency() -> float:
-    return _monitor_frequency
