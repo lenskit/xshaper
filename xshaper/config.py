@@ -7,7 +7,6 @@ from __future__ import annotations
 from os import PathLike
 from pathlib import Path
 
-_configured: bool = False
 _log_dir: Path | None = None
 
 
@@ -21,14 +20,10 @@ def configure(log_dir: PathLike[str] | None = None):
         monitor_frequency:
             The frequency for background system monitoring tasks (in seconds).
     """
-    global _configured, _log_dir
-    if _configured:
-        raise RuntimeError("shaperate already configured")
+    global _log_dir
 
     if log_dir is not None:
         _log_dir = Path(log_dir)
-
-    _configured = True
 
 
 def log_dir() -> Path | None:
