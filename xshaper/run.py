@@ -159,6 +159,7 @@ class Run:
         if lobby is None:
             return
 
+        lobby.mkdir(exist_ok=True, parents=True)
         runfile = lobby / f"{self.id}.json"
         _log.debug("saving run state to %s", runfile)
 

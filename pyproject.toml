@@ -47,6 +47,9 @@ doc = [
 Homepage = "https://xshaper.lenksit.org"
 GitHub = "https://github.com/lenskit/xshaper"
 
+[project.scripts]
+xshaper = "xshaper.cli:xshaper"
+
 # configure build tools
 [tool.hatch.metadata]
 allow-direct-references = true
