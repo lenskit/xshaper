@@ -146,8 +146,10 @@ class MonitorThread(Thread):
 
                 if update:
                     self._update_active()
+                    last_update = now
                 if save:
                     self._save_active()
+                    last_save = now
 
                 if reply is not None:
                     signal.send(reply)
