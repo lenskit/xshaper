@@ -136,11 +136,20 @@ class TimeRecord(BaseModel):
     "System CPU time (this run)."
 
     tot_cpu: float | None = None
-    "Total CPU time (including concurrent children)."
+    """
+    Total CPU time (including concurrent children).  This is usually not
+    populated until the records are incorporated through the CLI.
+    """
     tot_cpu_usr: float | None = None
-    "Userspace CPU time (including concurrent children)."
+    """
+    Userspace CPU time (including concurrent children).  This is usually not
+    populated until the records are incorporated through the CLI.
+    """
     tot_cpu_sys: float | None = None
-    "System CPU time (including concurrent children)."
+    """
+    System CPU time (including concurrent children).  This is usually not
+    populated until the records are incorporated through the CLI.
+    """
 
 
 class CPURecord(BaseModel):
