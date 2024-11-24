@@ -146,8 +146,11 @@ class CPURecord(BaseModel):
     Record of CPU utilization statistics.
     """
 
-    total_cpus: int | None
-    "Total logcial CPUs available on the system."
+    physical_cores: int | None
+    "Total phsyical cores on the system."
+
+    logical_cores: int | None
+    "Total logcial cores on the system."
 
     python_cpus: int | None
     """

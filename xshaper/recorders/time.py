@@ -20,6 +20,9 @@ class TimeRecorder:
         self.start_timer = time.perf_counter()
         self.start_ostimes = os.times()
 
+    def finish(self):
+        pass
+
     def update(self):
         c_timer = time.perf_counter()
         c_ostimes = os.times()
