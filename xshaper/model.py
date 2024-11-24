@@ -1,5 +1,5 @@
 """
-Shaperate record format for serialization.
+Shaperate data model and record format(s) for serialization.
 """
 
 from __future__ import annotations
@@ -63,7 +63,7 @@ class RunRecord(BaseModel):
     meta: RunMeta = Field(default_factory=dict)
     "Additional client-specified metadata for this run."
 
-    start_time: datetime
+    start_time: datetime = Field(default_factory=datetime.now)
     "The wall-clock time when this run started."
     end_time: datetime | None = None
     "The wall-clock time when this run concluded."
@@ -77,7 +77,7 @@ class RunRecord(BaseModel):
     machine: MachineRecord | None = None
     "The machine on which this run was run (if ``None``, inherits from parent)."
 
-    time: TimeRecord
+    time: TimeRecord = Field(default_factory=lambda: TimeRecord())
     "Wall and CPU time consumption."
     memory: MemoryRecord | None = None
     "Estimated memory use."
@@ -116,8 +116,16 @@ class TimeRecord(BaseModel):
     are in seconds.
     """
 
-    wall: float
-    "Wall-clock elapsed time."
+    wall: float = 0
+    """
+    Wall-clock elapsed time.
+
+    .. note::
+
+        This may *not* be the same as the difference between the run record's
+        start and end times, because it uses the system's monontonic clock (when
+        possible) whereas system time may have changed.
+    """
     self_cpu: float | None = None
     "Total CPU time (this run)."
     self_cpu_usr: float | None = None
