@@ -173,6 +173,12 @@ class Run:
         Finish the run.  You should usually use the run as a context manager
         instead of calling this method directly.
         """
+        from .monitor import active_monitor
+
+        if monitor := active_monitor():
+            # push measurements so we have the last available
+            monitor.refresh()
+
         _log.debug("ending run %s (state=%s)", self.id, status)
         STATE.pop_run(self)
 
@@ -185,6 +191,7 @@ class Run:
         self.save()
 
     def save(self):
+        "Save this run."
         lobby = lobby_dir()
         if lobby is None:
             return
@@ -197,6 +204,17 @@ class Run:
         tmpfile = runfile.with_suffix(".json.tmp")
         tmpfile.write_text(self.record.model_dump_json(exclude_unset=True))
         tmpfile.rename(runfile)
+
+    def remove(self):
+        "Remove the run from the record, if it has been saved."
+        lobby = lobby_dir()
+        if lobby is None:
+            return
+
+        runfile = lobby / f"{self.id}.json"
+        if runfile.exists():
+            _log.info("removing run record %s", runfile)
+            runfile.unlink()
 
     def __enter__(self) -> Self:
         self.begin()
