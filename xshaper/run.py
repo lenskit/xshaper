@@ -5,13 +5,16 @@ Classes and functions for recording runs.
 from __future__ import annotations
 
 import logging
+import os
+import platform
+import socket
 from datetime import datetime
 from threading import RLock
 from typing import Any, Iterable, Self
 from uuid import UUID, uuid4
 
 from .config import lobby_dir
-from .model import RunMeta, RunRecord, RunStatus
+from .model import MachineRecord, RunMeta, RunRecord, RunStatus
 from .recorders.compute import ComputeRecorder
 from .recorders.time import TimeRecorder
 
@@ -170,6 +173,7 @@ class Run:
 
         self.time_recorder.start()
         self.compute_recorder.start()
+        self._record_machine()
 
         if monitor := active_monitor():
             # push measurements so this run's recorders can initialize
@@ -222,6 +226,28 @@ class Run:
         if runfile.exists():
             _log.info("removing run record %s", runfile)
             runfile.unlink()
+
+    def _record_machine(self):
+        # only record the machine for the root run
+        if self.record.parent_id is not None:
+            return
+
+        hostname = socket.gethostname()
+        name = os.environ.get("XSHAPER_MACHINE_NAME", hostname)
+
+        self.record.machine = MachineRecord(
+            name=name,
+            hostname=hostname,
+            os=platform.system(),
+            os_version=platform.release(),
+            arch=platform.machine(),
+        )
+        try:
+            rel = platform.freedesktop_os_release()
+            self.record.machine.distro_id = rel["ID"]
+            self.record.machine.distro_version = rel["VERSION_ID"]
+        except Exception as e:
+            _log.debug("could not load freedesktop info: %s", e)
 
     def __enter__(self) -> Self:
         self.begin()
