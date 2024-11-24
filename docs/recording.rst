@@ -30,6 +30,7 @@ manager to wrap a body of computation comprising a single “run”:
     ``xshaper`` does not currently support concurrent “runs” in different threads.
 
 .. autoclass:: Run
+.. autofunction:: current_run
 
 Configuring xshaper
 ~~~~~~~~~~~~~~~~~~~

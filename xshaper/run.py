@@ -18,6 +18,13 @@ from .recorders.time import TimeRecorder
 _log = logging.getLogger(__name__)
 
 
+def current_run() -> Run | None:
+    """
+    Get the currently-active run, if any.
+    """
+    return STATE.current
+
+
 class RunState:
     "Current and parent runs."
 
