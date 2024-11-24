@@ -1,0 +1,3 @@
+sphinx >=8
+sphinxext-opengraph >=0.5
+furo
