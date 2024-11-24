@@ -5,7 +5,7 @@ Record run times.
 import os
 import time
 
-from .model import TimeRecord
+from ..model import TimeRecord
 
 
 class TimeRecorder:
