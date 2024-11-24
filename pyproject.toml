@@ -23,6 +23,7 @@ dependencies = [
   "humanize ~=4.5",
   "zstandard >=0.23",
   "click ~=8.0",
+  "pyzmq >=24",
 ]
 
 [dependency-groups]
