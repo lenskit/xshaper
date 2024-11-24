@@ -140,18 +140,41 @@ class TimeRecord(BaseModel):
     tot_cpu_sys: float | None = None
     "System CPU time (including concurrent children)."
 
-    avg_proc_cpu_util: float | None = None
+
+class CPURecord(BaseModel):
     """
-    Average CPU utilization by this process. Not normalized by process count
-    (100% = full use of 1 CPU).
+    Record of CPU utilization statistics.
+    """
+
+    total_cpus: int | None
+    "Total logcial CPUs available on the system."
+
+    python_cpus: int | None
+    """
+    Total CPUs reported by Python.  This is the result of :func:`os.cpu_count`;
+    it will usually equal :attr:`total_cpus` unless the ``PYTHON_CPU_COUNT``
+    variable is set.
+    """
+
+    process_cpus: int | None
+    """
+    The number of CPUs available to this process, as reported by
+    :func:`os.process_cpu_count` or :func:`os.sched_getaffinity`.
+    """
+
+    avg_process_util: float | None = None
+    """
+    Average CPU utilization by this process during the run. Not normalized by
+    process count (100% = full use of 1 CPU).
 
     .. seealso:: :meth:`psutil.Process.cpu_percent`
     """
-    avg_sys_cpu_util: float | None = None
+
+    avg_system_util: float | None = None
     """
     Average system-wide CPU utilization while this process is running.
 
-    .. seealso:: :meth:`psutil.cpu_percent`
+    .. seealso:: :func:`psutil.cpu_percent`
     """
 
 
