@@ -45,4 +45,4 @@ def lobby_dir() -> Path | None:
     """
     ld = log_dir()
     if ld is not None:
-        return ld / "recorded"
+        return ld / "lobby"
