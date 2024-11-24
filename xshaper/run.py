@@ -79,11 +79,12 @@ class Run:
 
     Runs should usually be used as context managers, e.g.::
 
-        with xshaper.run(...):
+        with xshaper.Run(...):
             pass
 
     For advanced usage scenarios, there are also manual :meth:`begin` and
-    :meth:`end` methods.
+    :meth:`end` methods.  Once the run has completed, the recorded information
+    can be accessed via :attr:`record`.
 
     Args:
         tags:
@@ -101,11 +102,16 @@ class Run:
     """
 
     id: UUID
+    "The run identifier."
     record: RunRecord
+    "The recorded run information."
     is_anchor: bool = False
+    "If this run is an anchor run."
 
     time_recorder: TimeRecorder
+    "This run's time recorder, for background updates."
     compute_recorder: ComputeRecorder
+    "This run's compute recorder, for background updates."
 
     _start_time: float
 
@@ -154,6 +160,10 @@ class Run:
         self.record.start_time = datetime.now()
 
         STATE.push_run(self, self.is_anchor)
+
+        self.time_recorder.start()
+        self.compute_recorder.start()
+
         if monitor := active_monitor():
             # push measurements so this run's recorders can initialize
             monitor.refresh()
@@ -165,6 +175,9 @@ class Run:
         """
         _log.debug("ending run %s (state=%s)", self.id, status)
         STATE.pop_run(self)
+
+        self.time_recorder.finish()
+        self.compute_recorder.finish()
 
         self.record.status = status
         self.record.end_time = datetime.now()

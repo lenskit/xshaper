@@ -1,3 +1,5 @@
 LensKit
 Shaperate
 eXperiment
+xshaper
+queryable
