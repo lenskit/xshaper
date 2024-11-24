@@ -30,3 +30,4 @@ class TimeRecorder:
         self.record.wall = c_timer - self.start_timer
         self.record.self_cpu_usr = c_ostimes.user - self.start_ostimes.user
         self.record.self_cpu_sys = c_ostimes.system - self.start_ostimes.system
+        self.record.self_cpu = self.record.self_cpu_usr + self.record.self_cpu_sys
