@@ -54,8 +54,8 @@ class RunRecord(BaseModel):
     root_id: UUID | None = None
     "The identifier for the root of this run's run tree."
 
-    concurrent: bool = False
-    "Whether this run is concurent with its siblings (e.g. worker processes)."
+    subprocess: bool = False
+    "Whether this run is a subprocess of its parent (e.g. worker processes)."
 
     tags: set[str] = Field(default_factory=set)
     "The run's tags (to enable search or querying later)."
@@ -116,6 +116,12 @@ class TimeRecord(BaseModel):
     """
     Record of the time (both wall-clock and CPU) consumed by a run.  All times
     are in seconds.
+
+    .. note::
+
+        The times currently only accumulate ``xshaper`` runs, they do not record
+        the time used by other child processes.  Figuring out how to do this
+        well is interesting future work.
     """
 
     wall: float = 0
@@ -137,17 +143,17 @@ class TimeRecord(BaseModel):
 
     tot_cpu: float | None = None
     """
-    Total CPU time (including concurrent children).  This is usually not
+    Total CPU time (including subprocess children).  This is usually not
     populated until the records are incorporated through the CLI.
     """
     tot_cpu_usr: float | None = None
     """
-    Userspace CPU time (including concurrent children).  This is usually not
+    Userspace CPU time (including subprocess children).  This is usually not
     populated until the records are incorporated through the CLI.
     """
     tot_cpu_sys: float | None = None
     """
-    System CPU time (including concurrent children).  This is usually not
+    System CPU time (including subprocess children).  This is usually not
     populated until the records are incorporated through the CLI.
     """
 

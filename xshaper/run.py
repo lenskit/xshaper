@@ -102,8 +102,8 @@ class Run:
         meta:
             Additional metadata for this run (JSON-compatible dictionary).  This
             dictionary is *copied* into the run record.
-        concurrent:
-            ``True`` to record this run as concurrent.
+        subprocess:
+            ``True`` to record this run as a subprocess.
         parent:
             A parent run ID; should only be used when creating worker process
             runs.
@@ -129,7 +129,7 @@ class Run:
         self,
         tags: Iterable[str] = (),
         meta: RunMeta = {},
-        concurrent: bool = False,
+        subprocess: bool = False,
         parent: UUID | None = None,
         anchor: bool = False,
     ):
@@ -143,7 +143,7 @@ class Run:
             parent_id=parent,
             tags=set(tags),
             meta=dict(meta),
-            concurrent=concurrent,
+            subprocess=subprocess,
         )
         if rrun := STATE.root:
             self.record.root_id = rrun.id
