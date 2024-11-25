@@ -20,4 +20,5 @@ Documentation Sections
 .. toctree::
     :maxdepth: 2
 
-    api
+    recording
+    model
