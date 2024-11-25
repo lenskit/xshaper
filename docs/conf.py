@@ -36,10 +36,12 @@ templates_path = ["_templates"]
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "psutil": ("https://psutil.readthedocs.io/en/stable/", None),
+    "pydantic": ("https://docs.pydantic.dev/latest/", None),
 }
 
 autodoc_default_options = {
     "members": True,
-    "member-order": "bysource"
+    "member-order": "bysource",
+    "show-inheritance": True,
 }
 autodoc_typehints = "description"
